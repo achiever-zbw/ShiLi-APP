@@ -1,0 +1,47 @@
+添加任务模块
+=====/task/add [POST]=====
+title - string - 必需 - 任务标题
+description - string - 不必 - 任务描述
+due_date - string - 不必 - 截止日期（可以空）
+tag - string - 不必 - 任务标签
+status - string - 不必 - 任务状态（默认pending）
+
+
+
+修改已有任务模块
+=====/task/update [PUT]=====
+task_id - int - 必需 - 要修改的任务id
+title - string - 不必 - 新标题
+description - string - 不必 - 新任务描述
+due_date - string - 不必 - 新截止日期
+tag - string - 不必 - 新标签
+status - string - 不必 - 新任务状态
+
+
+获取任务列表模块
+=====/task/list [GET]=====
+status - string - 不必 - 筛选任务状态
+tag - string - 不必 - 筛选任务标签（如 学习、工作）
+search - string - 不必 - 模糊搜索关键字（匹配标题和描述）
+
+笔记添加模块
+=====/note/add [POST]=====
+title - string - 必需 - 笔记标题
+content - string - 必需 - 笔记内容
+
+获取所有笔记标题
+=====/note/list [GET] =====
+
+获取笔记内容
+=====/note/<note_id> [GET] =====
+
+更新笔记内容
+=====/note/<note_id> [PUT] =====
+title - string - 必需 - 新标题
+content - string - 必需 - 新内容
+
+删除笔记
+===== /note/<note_id> [DELETE]
+
+
+
