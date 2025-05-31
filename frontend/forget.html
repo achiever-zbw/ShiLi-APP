@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>忘记密码</title>
+        <style>
+            body {
+                background-image: url(images/login_background.png);
+                background-size: cover;
+                margin: 0;
+                background-repeat: no-repeat;
+                font-family: Arial,sans-serif;
+                min-height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .container {
+                max-width: 400px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #fff;
+                border-radius: 5px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            h1 {
+                text-align: center;
+            }
+
+            input[type="text"],
+            input[type="password"] {
+                width: 95%;
+                padding: 10px;
+                margin-bottom: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+
+            input[type="submit"] {
+                text-align: center;
+                width: 80%;
+                padding: 12px;
+                background-color: #2196F3;
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                display: block;
+                margin: 0 auto;
+            }
+
+            input[type="submit"]:hover {
+                background-color: #1976D2;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            input[type="submit"]:active {
+                transform: translateY(0);
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            }
+
+            .message {
+                text-align: center;
+                margin-top: 10px;
+                font-size: 14px;
+            }
+
+            .success {
+                color: #4CAF50;
+            }
+
+            .error {
+                color: #f44336;
+            }
+
+            a {
+                text-decoration: none;
+                color: inherit;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>忘记密码</h1>
+            <form id="resetForm">
+                <input type="text" id="phone" placeholder="请输入手机号" required>
+                <input type="password" id="newPassword" placeholder="请输入新密码" required>
+                <input type="submit" value="重置密码">
+            </form>
+            <p id="message" class="message"></p>
+        </div>
+
+        <script>
+            document.getElementById('resetForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const phone = document.getElementById('phone').value;
+                const newPassword = document.getElementById('newPassword').value;
+                const messageElement = document.getElementById('message');
+
+                try {
+                    const response = await fetch('http://my_ip:5000/reset_password', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            phone: phone,
+                            new_password: newPassword
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // 直接跳转到登录页面
+                        window.location.href = 'login.html';
+                    } else {
+                        messageElement.className = 'message error';
+                        messageElement.textContent = data.error;
+                    }
+                } catch (error) {
+                    messageElement.className = 'message error';
+                    messageElement.textContent = '网络错误，请稍后重试';
+                }
+            });
+        </script>
+    </body>
+</html>

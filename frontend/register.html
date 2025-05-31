@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>任务管理器</title>
+        <style>
+            body {
+                background-image: url(images/login_background.png);
+                background-size: cover;
+                margin: 0;
+                background-repeat: no-repeat;
+                font-family: Arial,sans-serif;
+                min-height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .container {
+                max-width: 400px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #fff;
+                border-radius: 5px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            h1 {
+                text-align: center;
+            }
+
+            input[type="text"],
+            input[type="password"],
+            input[type="email"] {
+                width: 95%;
+                padding: 10px;
+                margin-bottom: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+
+            .verification-container {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+
+            #yanzhengma {
+                flex: 1;
+                width: auto;
+            }
+
+            button {
+                padding: 10px 20px;
+                background-color: #4CAF50;
+                color: #fff;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: bold;
+                transition: all 0.3s ease;
+                white-space: nowrap;
+            }
+
+            button:hover {
+                background-color: #45a049;
+                transform: translateY(-2px);
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            }
+
+            button:active {
+                transform: translateY(0);
+                box-shadow: none;
+            }
+
+            input[type="submit"] {
+                text-align: center;
+                width: 80%;
+                padding: 12px;
+                background-color: #2196F3;
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                display: block;
+                margin: 0 auto;
+            }
+
+            input[type="submit"]:hover {
+                background-color: #1976D2;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            input[type="submit"]:active {
+                transform: translateY(0);
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>注册</h1>
+            <form id="registerForm">
+                <input type="text" id="phone" placeholder="手机号" pattern="^1\d{10}$" required>
+                <input type="text" id="nickname" placeholder="昵称" required>
+                <input type="email" id="email" placeholder="邮箱" required>
+                <input type="password" id="password" placeholder="密码" required>
+                <input type="submit" value="注册">
+            </form>
+            <p id="message"></p>
+        </div>
+
+        <script>
+            // 生成随机nonce
+            function generateNonce() {
+                return Math.random().toString(36).substring(2, 15);
+            }
+
+            // 验证手机号格式
+            function validatePhone(phone) {
+                return /^1\d{10}$/.test(phone);
+            }
+
+            // 验证邮箱格式
+            function validateEmail(email) {
+                return /^[\w\.-]+@[\w\.-]+\.\w+$/.test(email);
+            }
+
+            document.getElementById('registerForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const phone = document.getElementById('phone').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const nickname = document.getElementById('nickname').value;
+                const messageElement = document.getElementById('message');
+
+                // 前端验证
+                if (!validatePhone(phone)) {
+                    messageElement.style.color = 'red';
+                    messageElement.textContent = '请输入正确的11位手机号';
+                    return;
+                }
+
+                if (!validateEmail(email)) {
+                    messageElement.style.color = 'red';
+                    messageElement.textContent = '请输入正确的邮箱格式';
+                    return;
+                }
+
+                if (password.length < 6) {
+                    messageElement.style.color = 'red';
+                    messageElement.textContent = '密码长度至少为6位';
+                    return;
+                }
+
+                try {
+                    console.log('发送注册请求...');
+                    const response = await fetch('http://my_ip:5000/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            phone: phone,
+                            email: email,
+                            password: password,
+                            nickname: nickname,
+                            timestamp: Math.floor(Date.now() / 1000), // 当前时间戳
+                            nonce: generateNonce() // 生成随机nonce
+                        })
+                    });
+
+                    console.log('收到响应:', response.status);
+                    const data = await response.json();
+                    console.log('响应数据:', data);
+
+                    if (response.ok) {
+                        messageElement.style.color = 'green';
+                        messageElement.textContent = data.message;
+                        // 注册成功后跳转到登录页面
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 2000);
+                    } else {
+                        messageElement.style.color = 'red';
+                        messageElement.textContent = data.error;
+                    }
+                } catch (error) {
+                    console.error('详细错误信息:', error);
+                    messageElement.style.color = 'red';
+                    messageElement.textContent = '网络错误，请稍后重试';
+                }
+            });
+        </script>
+    </body>
+</html>

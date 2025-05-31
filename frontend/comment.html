@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Notes</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <link rel="icon" href="/a.ico" type="image/x-icon">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 240px;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        .profile img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile .name {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .profile .email {
+            font-size: 12px;
+            color: gray;
+        }
+
+        .search-box {
+            margin: 15px 0 15px 0;
+        }
+
+        .search-box input {
+            width: 90%;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+        }
+
+        .nav {
+            flex-grow: 1;
+            padding: 0;
+        }
+
+        .nav .item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        .nav .item:hover {
+            background-color: #f5f5f5;
+            color: #3f51b5;
+        }
+
+        .nav .item.active {
+            background-color: #f5f5f5;
+            color: #3f51b5;
+        }
+
+        .nav .item i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .nav .item a {
+            text-decoration: none !important;
+            color: inherit !important;
+            font-weight: inherit !important;
+        }
+
+        .nav .item a:hover {
+            text-decoration: none !important;
+            color: inherit !important;
+        }
+
+        .main {
+            flex-grow: 1;
+            background-color: #e3e8ff;
+            color: #000;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+            overflow-y: auto;
+            justify-content: flex-start;
+        }
+
+        #tab7 {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        #tab7 .content-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            padding: 40px;
+            justify-content: flex-start;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .note-card {
+            background-color: white;
+            padding: 0;
+            border-radius: 15px;
+            width: 225px;
+            height: 320px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            overflow: hidden;
+            background-image: url(images/note_background.jpg);
+            background-size: cover;
+            background-position: center;
+            color: #000;
+        }
+
+        .note-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .note-card.new-note {
+            background-color: #e3e8ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #3f51b5;
+            width: 225px;
+            height: 320px;
+            background-image: none;
+        }
+
+        .note-card.new-note i {
+            font-size: 32px;
+            color: #3f51b5;
+            margin-bottom: 10px;
+        }
+
+        .note-card.new-note span {
+            color: #3f51b5;
+            font-size: 16px;
+        }
+
+        .note-card .content-overlay {
+            padding: 15px;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 50%);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .note-card .title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .note-card .date {
+            font-size: 10px;
+            color: #666;
+            text-align: center;
+        }
+
+        .note-card .preview {
+            display: none;
+        }
+
+        .note-detail {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: 1000;
+            padding: 40px;
+            background-size: cover;
+            background-position: center;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        .note-detail .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+        }
+
+        .note-detail .back-button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #3f51b5;
+            flex-shrink: 0;
+            margin-right: 10px;
+        }
+
+        .note-detail .title {
+            font-size: 32px;
+            font-weight: bold;
+            width: calc(100% - 50px);
+            border: 1px solid #000;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: transparent;
+            box-sizing: border-box;
+        }
+
+        .note-detail .content {
+            font-size: 18px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            width: 100%;
+            height: calc(100% - 200px);
+            border: 1px solid #000;
+            border-radius: 8px;
+            resize: none;
+            padding: 10px;
+            overflow-y: auto;
+            background-color: transparent;
+            box-sizing: border-box;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .note-detail .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .note-detail .actions button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .note-detail .actions .update-button {
+            background-color: #3f51b5;
+            color: white;
+        }
+
+        .note-detail .actions .delete-button {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .footer {
+            background-color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto 100px auto;
+            font-size: 18px;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer i {
+            margin-right: 15px;
+            font-size: 20px;
+        }
+
+        .footer span {
+            margin-left: 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 500px;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #333;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            height: 200px;
+            resize: vertical;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-footer button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .modal-footer .confirm {
+            background-color: #3f51b5;
+            color: white;
+        }
+
+        .modal-footer .cancel {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            z-index: 1001;
+            display: none;
+            animation: fadeInOut 2.5s ease-in-out;
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        .forum-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+            height: calc(100vh - 80px);
+            align-items: center;
+        }
+
+        .comment-input-area {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 95%;
+            max-width: 800px;
+            height: fit-content;
+            position: relative;
+            top: auto;
+            transform: none;
+            margin-top: 20px;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .comment-input-area textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            font-size: 14px;
+            box-sizing: border-box;
+            flex-grow: 1;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 0;
+        }
+
+        .clear-button {
+            background-color: #f5f5f5;
+            color: #666;
+            border: 1px solid #ddd;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            flex: none;
+        }
+
+        .clear-button:hover {
+            background-color: #e0e0e0;
+        }
+
+        .submit-button {
+            background-color: #3f51b5;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            flex: none;
+        }
+
+        .submit-button:hover {
+            background-color: #303f9f;
+        }
+
+        .comments-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            padding: 20px;
+            width: 95%;
+            max-width: 800px;
+            margin: 20px auto 0 auto;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .comment-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+        }
+
+        .comment-content {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .comment-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .delete-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .delete-button:hover {
+            background-color: #d32f2f;
+        }
+
+        /* 自定义滚动条样式 */
+        .comments-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .comments-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .comments-list::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .comments-list::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .comment-header {
+            margin-bottom: 8px;
+        }
+
+        .comment-author {
+            font-weight: bold;
+            color: #3f51b5;
+        }
+
+        .comment-text {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        .title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .title h1 {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+            font-size: 50px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            color: #000;
+            margin: 0;
+            padding: 20px 0;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="title">
+                    <h1>时砾</h1>
+                </div>
+
+
+
+            <ul class="nav">
+                <li id="tabbuttom1" class="item" onclick="showTab('tab1','tabbuttom1')"><i class="fas fa-pen"></i>我的一天
+                </li>
+                <li id="tabbuttom7" class="item" onclick="showTab('tab7','tabbuttom7')"><i
+                        class="fas fa-book-open"></i>笔记</li>
+                <li id="tabbuttom8" class="item" onclick="showTab('tab8','tabbuttom8')"><i
+                        class="fas fa-comments"></i>论坛</li>
+                <li id="tabbuttom9" class="item" onclick="showTab('tab9','tabbuttom9')"><i
+                        class="fas fa-user"></i>个人信息</li>
+            </ul>
+        </div>
+
+        <div class="main" id="tab8">
+            <!-- 论坛内容区域 -->
+            <div class="content-container forum-layout">
+                <!-- 评论列表区域 -->
+                <div class="comments-list" id="commentsList">
+                    <!-- 评论列表将由JavaScript动态加载 -->
+                </div>
+
+                <!-- 评论输入区域 -->
+                <div class="comment-input-area">
+                    <div class="input-row">
+                        <textarea id="commentContent" placeholder="写下你的评论..."></textarea>
+                        <button onclick="submitComment()" class="submit-button">发送</button>
+                    </div>
+                    <div class="button-group">
+                        <button onclick="clearComment()" class="clear-button">清空</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('tabbuttom8').classList.add("active");
+            loadComments(); // 加载评论列表
+            loadUserInfo(); // 加载用户信息
+        });
+
+        // 加载用户信息
+        async function loadUserInfo() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    console.error('未找到登录令牌');
+                    return;
+                }
+
+                const response = await fetch('http://my_ip:5000/user/info', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    // 保存用户ID到localStorage
+                    localStorage.setItem('userId', data.user.id);
+                } else {
+                    console.error('获取用户信息失败:', data.error);
+                }
+            } catch (error) {
+                console.error('加载用户信息时出错:', error);
+            }
+        }
+
+        // 提交评论
+        async function submitComment() {
+            const content = document.getElementById('commentContent').value.trim();
+            if (!content) {
+                alert('评论内容不能为空');
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('请先登录');
+                    return;
+                }
+
+                const response = await fetch('http://my_ip:5000/comments/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ content: content })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('commentContent').value = ''; // 清空输入框
+                    loadComments(); // 重新加载评论列表
+                    alert('评论发表成功');
+                } else {
+                    alert(data.error || '评论发表失败');
+                }
+            } catch (error) {
+                console.error('Error submitting comment:', error);
+                alert('评论发表失败');
+            }
+        }
+
+        // 加载评论列表
+        async function loadComments() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('请先登录');
+                    return;
+                }
+
+                const response = await fetch('http://my_ip:5000/comments/list', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    displayComments(data.comments);
+                } else {
+                    alert('获取评论列表失败');
+                }
+            } catch (error) {
+                console.error('Error loading comments:', error);
+                alert('加载评论列表失败');
+            }
+        }
+
+        // 显示评论列表
+        function displayComments(comments) {
+            const commentsList = document.getElementById('commentsList');
+            commentsList.innerHTML = ''; // 清空现有评论
+
+            // 获取当前用户ID
+            const currentUserId = localStorage.getItem('userId');
+
+            comments.forEach(comment => {
+                const commentElement = document.createElement('div');
+                commentElement.className = 'comment-item';
+
+                // 创建评论内容区域
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'comment-content';
+                contentDiv.innerHTML = `
+                    <div class="comment-header">
+                        <span class="comment-author">${comment.nickname}</span>
+                    </div>
+                    <div class="comment-text">${comment.content}</div>
+                `;
+
+                // 创建评论操作区域
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'comment-actions';
+
+                // 只有当评论是当前用户发布的时候才显示删除按钮
+                if (comment.user_id === parseInt(currentUserId)) {
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'delete-button';
+                    deleteButton.textContent = '删除';
+                    deleteButton.onclick = () => deleteComment(comment.id);
+                    actionsDiv.appendChild(deleteButton);
+                }
+
+                commentElement.appendChild(contentDiv);
+                commentElement.appendChild(actionsDiv);
+                commentsList.appendChild(commentElement);
+            });
+        }
+
+        // 删除评论
+        async function deleteComment(commentId) {
+            if (!confirm('确定要删除这条评论吗？')) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('请先登录');
+                    return;
+                }
+
+                const response = await fetch(`http://my_ip:5000/comments/${commentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    loadComments(); // 重新加载评论列表
+                    alert('评论删除成功');
+                } else {
+                    alert(data.message || '删除评论失败');
+                }
+            } catch (error) {
+                console.error('Error deleting comment:', error);
+                alert('删除评论失败');
+            }
+        }
+
+        // 清空评论内容
+        function clearComment() {
+            document.getElementById('commentContent').value = '';
+        }
+
+        // 添加showTab函数
+        function showTab(tabId, buttonId) {
+            // 如果点击的是"我的一天"，则跳转到task.html
+            if (tabId === 'tab1') {
+                window.location.href = 'task.html';
+                return;
+            }
+            // 如果点击的是笔记，则跳转到note.html
+            if (tabId === 'tab7') {
+                window.location.href = 'note.html';
+                return;
+            }
+
+            // 如果点击的是个人信息，则跳转到person.html
+            if (tabId === 'tab9') {
+                window.location.href = 'person.html';
+                return;
+            } 
+
+            // 隐藏所有tab
+            const tabs = document.querySelectorAll('.main');
+            tabs.forEach(tab => {
+                tab.style.display = 'none';
+            });
+
+            // 显示选中的tab
+            document.getElementById(tabId).style.display = 'flex';
+
+            // 移除所有按钮的active类
+            const buttons = document.querySelectorAll('.nav .item');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // 给选中的按钮添加active类
+            document.getElementById(buttonId).classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

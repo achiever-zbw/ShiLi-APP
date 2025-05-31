@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Day</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <link rel="icon" href="images/logo.ico" type="image/x - icon">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 240px;
+            background-color: #f6f6f6;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        .profile img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+        }】、
+
+        .profile .name {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .profile .email {
+            font-size: 12px;
+            color: gray;
+        }
+
+        .search-box {
+            margin: 15px 0 15px 0;
+        }
+
+        .search-box input {
+            width: 90%;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+        }
+
+        .nav {
+            flex-grow: 1;
+            padding: 0;
+        }
+
+        .nav .item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        .nav .item:hover {
+            background-color: #e3e8ff;
+            color: #3f51b5;
+        }
+
+        .nav .item.active {
+            background-color: #e3e8ff;
+            color: #3f51b5;
+        }
+
+        .nav .item i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .nav .item a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .main {
+            flex-grow: 1;
+            background-image: url('images/task_background.jpg');
+            background-size: cover;
+            background-position: center;
+            color: #000;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+            overflow-y: auto;
+            justify-content: flex-start;
+        }
+
+        #tab1 {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        #tab1 .content-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            padding: 0 40px;
+            flex: 1;
+        }
+
+        .footer {
+            background-color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto 100px auto;
+            font-size: 18px;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-buttons {
+            margin: 0;
+            flex: 0 0 45%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .plan {
+            background-color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 0;
+            flex: 0 0 45%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .date-section {
+            font-family: 'Georgia', serif;
+            margin-bottom: 20px;
+        }
+
+        .date-section h1 {
+            font-size: 36px;
+            margin: 0;
+        }
+
+        .date-section p {
+            font-style: italic;
+            font-size: 18px;
+            margin-top: 4px;
+        }
+
+        .task-buttons .task {
+            background-color: white;
+            border-radius: 30px;
+            padding: 15px 25px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 400px;
+            font-size: 24px;
+        }
+
+        .task-buttons .task button {
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .task-buttons .task span {
+            font-weight: bold;
+        }
+
+        .plan h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .plan .item {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .plan .item i {
+            color: #3f51b5;
+            margin-right: 15px;
+            font-size: 24px;
+        }
+
+        .plan .item span {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .footer i {
+            margin-right: 15px;
+            font-size: 20px;
+        }
+
+        .footer span {
+            margin-left: 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 500px;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #333;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-footer button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .modal-footer .confirm {
+            background-color: #3f51b5;
+            color: white;
+        }
+
+        .modal-footer .cancel {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            z-index: 1001;
+            display: none;
+            animation: fadeInOut 2.5s ease-in-out;
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* 添加任务显示样式 */
+        .task-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .task-title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .task-description {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .task-due-date {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .task-tag {
+            display: inline-block;
+            padding: 2px 6px;
+            background-color: #e3e8ff;
+            color: #3f51b5;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .task-status {
+            display: inline-block;
+            padding: 2px 6px;
+            background-color: #f5f5f5;
+            color: #666;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        /* 添加新的样式 */
+        .user-info-form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            border-color: #3f51b5;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.1);
+        }
+
+        .form-actions {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .update-button {
+            background-color: #3f51b5;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .update-button:hover {
+            background-color: #303f9f;
+        }
+        .title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .title h1 {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+            font-size: 50px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            color: #000;
+            margin: 0;
+            padding: 20px 0;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+</head>
+
+    <body>
+        <div class="container">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="title">
+                    <h1>时砾</h1>
+                </div>
+
+
+            <ul class="nav">
+                <li id="tabbuttom1" class="item" onclick="showTab('tab1','tabbuttom1')"><i class="fas fa-pen"></i>我的一天</li>
+                <li id="tabbuttom7" class="item" onclick="showTab('tab7','tabbuttom7')"><i class="fas fa-book-open"></i><a href="note.html">笔记</a></li>
+                <li id="tabbuttom8" class="item" onclick="showTab('tab8','tabbuttom8')"><i class="fas fa-comments"></i><a href="comment.html">论坛</a></li>
+                <li id="tabbuttom9" class="item" onclick="showTab('tab9','tabbuttom9')"><i class="fas fa-user"></i>个人信息</li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main" id="tab9">
+
+            <div class="date-section">
+                <h1>个人信息</h1>
+                <p>个人资料设置</p>
+            </div>
+
+            <div class="content-container">
+                <div class="user-info-form">
+                    <div class="form-group">
+                        <label for="phone">手机号</label>
+                        <input type="tel" id="phone" placeholder="请输入11位手机号" maxlength="11" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nickname">昵称</label>
+                        <input type="text" id="nickname" placeholder="请输入昵称" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">电子邮箱</label>
+                        <input type="email" id="email" placeholder="请输入电子邮箱" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">密码</label>
+                        <input type="password" id="password" placeholder="请输入密码" required>
+                    </div>
+                    <div class="form-actions">
+                        <button class="update-button" onclick="updateUserInfo()">更新信息</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Add Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>添加新任务</h2>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="taskTitle">任务标题</label>
+                    <input type="text" id="taskTitle" placeholder="请输入任务标题" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskDescription">任务描述</label>
+                    <textarea id="taskDescription" placeholder="请输入任务描述"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="taskDueDate">截止日期</label>
+                    <input type="datetime-local" id="taskDueDate">
+                </div>
+                <div class="form-group">
+                    <label for="taskTag">标签</label>
+                    <select id="taskTag">
+                        <option value="">请选择标签</option>
+                        <option value="紧急">紧急</option>
+                        <option value="重要">重要</option>
+                        <option value="普通">普通</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="taskStatus">状态</label>
+                    <select id="taskStatus">
+                        <option value="pending">待完成</option>
+                        <option value="in_progress">进行中</option>
+                        <option value="completed">已完成</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel" onclick="closeModal()">取消</button>
+                <button class="confirm" onclick="addTask()">完成</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // 添加showTab函数
+        function showTab(tabId, buttonId) {
+            // 如果点击的是"我的一天"，则跳转到task.html
+            if (tabId === 'tab1') {
+                window.location.href = 'task.html';
+                return;
+            }
+            // 如果点击的是笔记，则跳转到note.html
+            if (tabId === 'tab7') {
+                window.location.href = 'note.html';
+                return;
+            }
+            // 如果点击的是论坛，则跳转到comment.html
+            if (tabId === 'tab8') {
+                window.location.href = 'comment.html';
+                return;
+            }
+
+            // 隐藏所有tab
+            const tabs = document.querySelectorAll('.main');
+            tabs.forEach(tab => {
+                tab.style.display = 'none';
+            });
+
+            // 显示选中的tab
+            document.getElementById(tabId).style.display = 'flex';
+
+            // 移除所有按钮的active类
+            const buttons = document.querySelectorAll('.nav .item');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // 给选中的按钮添加active类
+            document.getElementById(buttonId).classList.add('active');
+        }
+
+        // 日期格式化函数
+        function formatDateForDisplay(date) {
+            const options = { weekday: 'long', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('zh-CN', options);
+        }
+
+        function formatDateForAPI(date) {
+            // 使用ISO格式：YYYY-MM-DDTHH:MM
+            return date.toISOString().slice(0, 16);
+        }
+
+        // 更新日期显示
+        function updateDateDisplay() {
+            const now = new Date();
+            const dateSection = document.querySelector('.date-section p');
+            dateSection.textContent = formatDateForDisplay(now);
+        }
+
+        // 显示模态框
+        function showModal() {
+            const modal = document.getElementById('taskModal');
+            modal.style.display = 'block';
+
+            // 设置默认的截止日期为当前时间
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+
+            document.getElementById('taskDueDate').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+            document.getElementById('taskTitle').focus();
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            const modal = document.getElementById('taskModal');
+            modal.style.display = 'none';
+            // 清空所有输入
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskDescription').value = '';
+            document.getElementById('taskDueDate').value = '';
+            document.getElementById('taskTag').value = '';
+            document.getElementById('taskStatus').value = 'pending';
+        }
+
+        // 显示提示消息
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+
+            // 2.5秒后自动隐藏
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2500);
+        }
+
+        // 添加任务
+        async function addTask() {
+            const title = document.getElementById('taskTitle').value.trim();
+            const description = document.getElementById('taskDescription').value.trim();
+            const dueDateInput = document.getElementById('taskDueDate').value;
+            const tag = document.getElementById('taskTag').value;
+            const status = document.getElementById('taskStatus').value;
+
+            if (!title) {
+                showToast('请输入任务标题');
+                return;
+            }
+
+            // 处理日期格式
+            let formattedDueDate = null;
+            if (dueDateInput) {
+                try {
+                    const date = new Date(dueDateInput);
+                    // 格式化为 YYYY-MM-DD HH:mm:ss
+                    formattedDueDate = date.getFullYear() + '-' +
+                        String(date.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(date.getDate()).padStart(2, '0') + ' ' +
+                        String(date.getHours()).padStart(2, '0') + ':' +
+                        String(date.getMinutes()).padStart(2, '0') + ':00';
+                } catch (error) {
+                    showToast('日期格式无效');
+                    return;
+                }
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    showToast('未找到登录令牌');
+                    return;
+                }
+
+                const response = await fetch('http://my_ip:5000/task/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        description: description,
+                        due_date: formattedDueDate,
+                        tag: tag,
+                        status: status
+                    })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    closeModal();
+                    showToast('任务添加成功');
+                    await loadTasks();
+                } else {
+                    showToast(data.error || '添加任务失败');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('添加任务失败');
+            }
+        }
+
+        // 加载任务列表
+        async function loadTasks() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    console.error('未找到登录令牌');
+                    return;
+                }
+
+                const response = await fetch('http://my_ip:5000/task/list', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    updateTaskDisplay(data.tasks);
+                } else {
+                    console.error('获取任务列表失败:', await response.json());
+                }
+            } catch (error) {
+                console.error('加载任务时出错:', error);
+            }
+        }
+
+        // 更新任务显示
+        function updateTaskDisplay(tasks) {
+            const taskButtons = document.querySelector('.task-buttons');
+            const planSection = document.querySelector('.plan');
+
+            // 清空现有任务
+            taskButtons.innerHTML = '';
+            planSection.innerHTML = '<h3>计划</h3>';
+
+            // 按时间排序任务
+            tasks.sort((a, b) => {
+                if (!a.due_date) return 1;
+                if (!b.due_date) return -1;
+                return new Date(a.due_date) - new Date(b.due_date);
+            });
+
+            // 添加任务到显示区域
+            tasks.forEach(task => {
+                // 添加到任务列表
+                const taskElement = document.createElement('div');
+                taskElement.className = 'task';
+                taskElement.innerHTML = `
+                    <span>${task.title}</span>
+                    <button onclick="deleteTask(${task.id})">&times;</button>
+                `;
+                taskButtons.appendChild(taskElement);
+
+                // 如果有截止时间，添加到计划区域
+                if (task.due_date) {
+                    const dueDate = new Date(task.due_date);
+                    // 获取 UTC 时间并转换为本地时间
+                    const utcHours = dueDate.getUTCHours();
+                    const localHours = (utcHours + 8) % 24;
+                    const minutes = dueDate.getUTCMinutes();
+
+                    // 格式化时间
+                    const timeStr = `${localHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+
+                    const planItem = document.createElement('div');
+                    planItem.className = 'item';
+                    planItem.innerHTML = `
+                        <i class="far fa-star"></i>
+                        <span>${timeStr} ${task.title}</span>
+                    `;
+                    planSection.appendChild(planItem);
+                }
+            });
+        }
+
+        // 删除任务
+        async function deleteTask(taskId) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    console.error('未找到登录令牌');
+                    return;
+                }
+
+                const response = await fetch(`http://my_ip:5000/task/delete/${taskId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    console.log('任务删除成功');
+                    loadTasks(); // 重新加载任务列表
+                } else {
+                    console.error('删除任务失败:', await response.json());
+                }
+            } catch (error) {
+                console.error('删除任务时出错:', error);
+            }
+        }
+
+        // 添加更新用户信息的函数
+        async function updateUserInfo() {
+            const phone = document.getElementById('phone').value.trim();
+            const nickname = document.getElementById('nickname').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            // 验证所有字段是否填写
+            if (!phone || !nickname || !email || !password) {
+                showToast('请填写所有字段');
+                return;
+            }
+
+            // 验证手机号格式
+            if (!/^1[3-9]\d{9}$/.test(phone)) {
+                showToast('手机号必须是11位数字');
+                return;
+            }
+
+            // 验证邮箱格式
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showToast('邮箱格式不正确');
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    showToast('未找到登录令牌');
+                    return;
+                }
+
+                const response = await fetch('http://my_ip:5000/user/update_user', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        phone: phone,
+                        nickname: nickname,
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    showToast('个人信息更新成功');
+                    // 更新成功后清空密码字段
+                    document.getElementById('password').value = '';
+                    // 重新加载用户信息
+                    await loadUserInfo();
+                } else {
+                    showToast(data.error || '更新失败');
+                }
+            } catch (error) {
+                console.error('Error updating user info:', error);
+                showToast('更新失败，请稍后重试');
+            }
+        }
+
+        // 页面加载时获取用户信息
+        async function loadUserInfo() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    showToast('未找到登录令牌');
+                    return;
+                }
+
+                const response = await fetch('http://my_ip:5000/user/data', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    // 填充表单
+                    document.getElementById('phone').value = data.phoneNumber || '';
+                    document.getElementById('nickname').value = data.nickname || '';
+                    document.getElementById('email').value = data.email || '';
+                } else {
+                    showToast(data.error || '获取用户信息失败');
+                }
+            } catch (error) {
+                console.error('Error loading user info:', error);
+                showToast('加载用户信息失败');
+            }
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('tab9').style.display = 'flex';
+            document.getElementById('tabbuttom9').classList.add("active");
+            updateDateDisplay();
+            loadTasks();
+            loadUserInfo(); // 加载用户信息
+
+            // 为footer添加点击事件
+            document.querySelector('.footer').addEventListener('click', showModal);
+        });
+    </script>
+</body>
+
+</html>
